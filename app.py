@@ -28,6 +28,8 @@ with st.sidebar.form('Adjust length'):
 
     if submitted:
         st.session_state.beam_length = length
+
+
 # Form for adding new loads
 with st.sidebar.form("add_load"):
     
@@ -43,7 +45,10 @@ with st.sidebar.form("add_load"):
 
 # Button to clear all loads
 if st.sidebar.button("Clear All Loads"):
-    st.session_state.loads = []
+    st.session_state.loads = {
+        'magnitudes': [],
+        'postions': []
+    }
 
 
 
@@ -56,28 +61,14 @@ for i, (magnitude, position) in enumerate(zip(st.session_state.loads['magnitudes
 
 
 
-
-# Calculate SFD and BMD
-def calculate_diagrams(loads, beam_length=10, num_points=1000):
-    x = np.linspace(0, beam_length, num_points)
-    shear = np.zeros_like(x)
-    moment = np.zeros_like(x)
-    
-    for load in loads:
-    
-        # Point load contribution
-        shear += load['magnitude'] * (x >= load['position'])
-        moment += load['magnitude'] * np.maximum(0, x - load['position'])
-
-    return x, shear, moment
-
 # Calculate and plot diagrams
 x, shear = calculate(
     st.session_state.beam_length,
-    magnitudes=st.session_state.loads['magnitudes'],
-    distances=st.session_state.loads['postions']
+    magnitudes=st.session_state.loads['magnitudes'].copy(),
+    distances=st.session_state.loads['postions'].copy()
 )
 
+print(x)
 # Create SFD plot
 fig_sfd = go.Figure()
 fig_sfd.add_trace(go.Scatter(x=x, y=shear, mode='lines', name='Shear Force'))
