@@ -62,13 +62,12 @@ for i, (magnitude, position) in enumerate(zip(st.session_state.loads['magnitudes
 
 
 # Calculate and plot diagrams
-x, shear = calculate(
+x, shear, moment = calculate(
     st.session_state.beam_length,
     magnitudes=st.session_state.loads['magnitudes'].copy(),
     distances=st.session_state.loads['postions'].copy()
 )
 
-print(x)
 # Create SFD plot
 fig_sfd = go.Figure()
 fig_sfd.add_trace(go.Scatter(x=x, y=shear, mode='lines', name='Shear Force'))
@@ -81,7 +80,7 @@ fig_sfd.update_layout(
 st.plotly_chart(fig_sfd)
 
 
-"""
+
 # Create BMD plot
 fig_bmd = go.Figure()
 fig_bmd.add_trace(go.Scatter(x=x, y=moment, mode='lines', name='Bending Moment'))
@@ -93,4 +92,3 @@ fig_bmd.update_layout(
 )
 st.plotly_chart(fig_bmd)
 
-"""

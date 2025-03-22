@@ -24,7 +24,7 @@ def draw_sfd(**forces):
     x = np.linspace(0, forces['dists'][-1], 100)
     y = np.zeros_like(x)
 
-    temp :int = 0
+    temp : int = 0
     for i in range(len(forces['magnitudes']) - 1):
         temp += - forces['magnitudes'][i]
         y += temp * ( x < forces['dists'][i + 1]) * (forces['dists'][i] <= x)
@@ -36,9 +36,17 @@ def draw_sfd(**forces):
 def draw_bmd(**forces):
     
     x = np.linspace(0, forces['dists'][-1], 100)
-    
-    
-    return x, y
+    mags = np.array(forces['magnitudes'])
+    dists = np.array(forces['dists'])
+    y = np.zeros_like(x)
+
+    for i in range(len(x)):
+        filters = (dists < x[i])
+        bm = ((x[i] - dists) * filters) @ (mags * filters).T
+        y[i] = bm
+
+
+    return y
 
 def calculate(
         length : int, 
@@ -58,8 +66,8 @@ def calculate(
     distances.append(length)
     
     shear = draw_sfd(magnitudes=magnitudes, dists=distances)
-    
-    return x, shear
+    bmd = draw_bmd(magnitudes=magnitudes, dists=distances)
+    return x, shear, -bmd
 
 
 if __name__ == '__main__':
