@@ -31,14 +31,14 @@ def create_visualizer(loads):
             width: 0;
             height: 0;
         }
-        .upward {
+        .downward {
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
             border-top: 30px solid #FF4B4B;
             bottom: 50px; /* Adjusted so the tip touches the beam's lower border */
             filter: drop-shadow(2px 2px 5px rgba(255, 75, 75, 0.5));
         }
-        .downward {
+        .upward {
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
             border-bottom: 30px solid #FF4B4B;
@@ -56,8 +56,6 @@ def create_visualizer(loads):
 
     data = ""
     for i, load in enumerate(loads):
-        print(load['position'])
-        print(st.session_state.beam_length * 100, "\n\n")
         data += f"<div id=\"force{i}\" class=\"force {load["direction"].lower()}\" style=\"left: {load['position'] / st.session_state.beam_length * 100}%;\"></div>"
     
     
@@ -69,6 +67,8 @@ def create_visualizer(loads):
         <div class="pillar right"></div>
         {data}
     </div>
+    <br>
+    <br>
     """)
 
     st.html("""

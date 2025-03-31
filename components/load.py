@@ -46,7 +46,7 @@ def create_load_section(length, key_prefix=""):
                 0.0, length, 5.0, 
                 key=f"{key_prefix}_position"
             )
-            
+
             
         with col4:
             delete_load = st.button(

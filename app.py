@@ -23,7 +23,6 @@ if "loads_list" not in st.session_state:
 
 
 
-
 # Sidebar for adding loads
 st.sidebar.header("Settings")
 
@@ -35,36 +34,6 @@ with st.sidebar.form('Adjust length'):
         st.session_state.beam_length = length
 
 
-# Form for adding new loads
-with st.sidebar.form("add_load"):
-    
-    magnitude = st.number_input("Magnitude (kN)", key="magnitude")
-    
-    position = st.slider("Position from left (m)", 0.0, length, 5.0, key="position")
-    submitted = st.form_submit_button("Add Load")
-    
-    if submitted:
-        st.session_state.loads['magnitudes'].append(magnitude)
-        st.session_state.loads['postions'].append(position)
-        
-
-# Button to clear all loads
-if st.sidebar.button("Clear All Loads"):
-    st.session_state.loads = {
-        'magnitudes': [],
-        'postions': []
-    }
-
-
-# Display current loads
-st.sidebar.header("Current Loads")
-for i, (magnitude, position) in enumerate(zip(st.session_state.loads['magnitudes'], st.session_state.loads['postions'])):
-    st.sidebar.text(f"{i+1}. Point Load: {magnitude} kN at {position} m")
-
-
-
-# Calculate and plot diagrams
-create_visualizer(st.session_state.loads_list.copy())
 
 
 #with st.container(key='beam_params', border=True):
@@ -73,12 +42,9 @@ create_visualizer(st.session_state.loads_list.copy())
 
 loads = load_section(st.session_state.beam_length)
 
-# Use the loads data for calculations or visualization
-st.write(f"Number of loads: {len(loads)}")
+# update_visualizer
+create_visualizer(st.session_state.loads_list.copy())
 
-# You can access each load's properties like this:
-for i, load in enumerate(loads):
-    st.write(f"Load {i+1}: {load['magnitude']} kN, {load['direction']}, at position {load['position']} m")
 
 magnitudes, positions = separate_positions(st.session_state.loads_list.copy())
 
