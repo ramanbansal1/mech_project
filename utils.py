@@ -21,7 +21,7 @@ def calculate_reactions(length, **forces):
     return r_a, r_b
 
 def draw_sfd(**forces):
-    x = np.linspace(0, forces['dists'][-1], 100)
+    x = np.linspace(0, forces['dists'][-1], 1000)
     y = np.zeros_like(x)
 
     temp : int = 0
@@ -35,7 +35,7 @@ def draw_sfd(**forces):
 
 def draw_bmd(**forces):
     
-    x = np.linspace(0, forces['dists'][-1], 100)
+    x = np.linspace(0, forces['dists'][-1], 1000)
     mags = np.array(forces['magnitudes'])
     dists = np.array(forces['dists'])
     y = np.zeros_like(x)
@@ -69,6 +69,15 @@ def calculate(
     bmd = draw_bmd(magnitudes=magnitudes, dists=distances)
     return x, shear, -bmd
 
+def separate_positions(load_list):
+    magnitudes = []
+    positions = []
+    for load in load_list:
+        mag = load["magnitude"] if load['direction'] == 'Downward' else - load["magnitude"]
+        pos = load['position']
+        magnitudes.append(mag)
+        positions.append(pos)
+    return magnitudes, positions
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
@@ -87,3 +96,4 @@ if __name__ == '__main__':
     plt.plot(x, y)
     plt.grid()
     plt.savefig("plot.png")
+
