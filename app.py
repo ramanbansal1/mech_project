@@ -2,20 +2,25 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
-from utils import calculate 
+from utils import calculate, separate_positions
+from components.plot import sf_plot, bmd_plot
+from components.load import create_load_section, load_section
+from components.visualize import create_visualizer
+
 
 # Set page title
 st.title("Beam Analysis - SFD and BMD Calculator")
 
 # Initialize session state for loads if it doesn't exist
-if 'loads' not in st.session_state:
-    st.session_state.loads = {
-        'magnitudes': [],
-        'postions': []
-    }
-
 if 'beam_length' not in st.session_state:
     st.session_state.beam_length = 10.0
+
+if 'load_count' not in st.session_state:
+    st.session_state.load_count = 0
+
+if "loads_list" not in st.session_state:
+        st.session_state.loads_list = []
+
 
 
 
@@ -51,9 +56,6 @@ if st.sidebar.button("Clear All Loads"):
     }
 
 
-
-
-
 # Display current loads
 st.sidebar.header("Current Loads")
 for i, (magnitude, position) in enumerate(zip(st.session_state.loads['magnitudes'], st.session_state.loads['postions'])):
@@ -62,33 +64,31 @@ for i, (magnitude, position) in enumerate(zip(st.session_state.loads['magnitudes
 
 
 # Calculate and plot diagrams
+create_visualizer(st.session_state.loads_list.copy())
+
+
+#with st.container(key='beam_params', border=True):
+#    st.header("Beam Parameters")
+#    st.session_state.beam_length = st.number_input(label="Beam Lenght (m)", min_value=1.0, step=1.0, value=10.0)
+
+loads = load_section(st.session_state.beam_length)
+
+# Use the loads data for calculations or visualization
+st.write(f"Number of loads: {len(loads)}")
+
+# You can access each load's properties like this:
+for i, load in enumerate(loads):
+    st.write(f"Load {i+1}: {load['magnitude']} kN, {load['direction']}, at position {load['position']} m")
+
+magnitudes, positions = separate_positions(st.session_state.loads_list.copy())
+
 x, shear, moment = calculate(
     st.session_state.beam_length,
-    magnitudes=st.session_state.loads['magnitudes'].copy(),
-    distances=st.session_state.loads['postions'].copy()
+    magnitudes=magnitudes,
+    distances=positions,
 )
 
-# Create SFD plot
-fig_sfd = go.Figure()
-fig_sfd.add_trace(go.Scatter(x=x, y=shear, mode='lines', name='Shear Force'))
-fig_sfd.update_layout(
-    title='Shear Force Diagram',
-    xaxis_title='Position (m)',
-    yaxis_title='Shear Force (kN)',
-    height=400
-)
-st.plotly_chart(fig_sfd)
-
-
-
-# Create BMD plot
-fig_bmd = go.Figure()
-fig_bmd.add_trace(go.Scatter(x=x, y=moment, mode='lines', name='Bending Moment'))
-fig_bmd.update_layout(
-    title='Bending Moment Diagram',
-    xaxis_title='Position (m)',
-    yaxis_title='Bending Moment (kN·m)',
-    height=400
-)
-st.plotly_chart(fig_bmd)
+# PLOTS 
+st.plotly_chart(sf_plot(x, shear))
+st.plotly_chart(bmd_plot(x, moment))
 
